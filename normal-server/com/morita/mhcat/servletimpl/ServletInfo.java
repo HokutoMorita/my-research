@@ -7,10 +7,9 @@ public class ServletInfo {
     String servletClassName;
     HttpServlet servlet;
 
-    public ServletInfo(WebApplication webApp, String urlPattern,
-                       String servletClassName) {
-	this.webApp = webApp;
-	this.urlPattern = urlPattern;
-	this.servletClassName = servletClassName;
+    public ServletInfo(WebApplication webApp, String urlPattern, String servletClassName) {
+        this.webApp = webApp;
+        this.urlPattern = urlPattern;
+        this.servletClassName = servletClassName;
     }
 }

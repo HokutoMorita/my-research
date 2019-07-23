@@ -59,7 +59,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 		String[] decoded = new String[values.length];
 		try {
 			for (int i = 0; i < values.length; i++) {
-			decoded[i] = MyURLDecoder.decode(values[i], this.characterEncoding);
+				decoded[i] = MyURLDecoder.decode(values[i], this.characterEncoding);
 			}
 		} catch (UnsupportedEncodingException ex) {
 			throw new AssertionError(ex);

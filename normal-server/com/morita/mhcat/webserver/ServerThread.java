@@ -8,8 +8,8 @@ import com.morita.mhcat.servletimpl.*;
 import com.morita.mhcat.util.*;
 
 public class ServerThread implements Runnable {
-    private static final String DOCUMENT_ROOT = "C:\\Apache24\\htdocs";
-    private static final String ERROR_DOCUMENT = "C:\\webserver\\error_document";
+    private static final String DOCUMENT_ROOT = "/Library/WebServer/Documents";
+    private static final String ERROR_DOCUMENT = "/Users/moritahokuto/workspace/prog_ex/prog_web_server/src/webserver/error_document";
 	private Socket socket;
 	
 	ServerThread(Socket socket) {

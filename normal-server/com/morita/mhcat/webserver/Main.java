@@ -5,10 +5,10 @@ import java.net.*;
 
 public class Main {
     public static void main(String[] argv) throws Exception {
-		WebApplication app = WebApplication.createInstance("sessiontest");
-		app.addServlet("/SessionTest", "SessionTest");
-		app = WebApplication.createInstance("ajaxtest");
-		app.addServlet("/GetAddress", "GetAddress");
+		WebApplication app = WebApplication.createInstance("testbbs");
+		// WebApplicationにサーブレットを登録している。
+		app.addServlet("/ShowBBS", "ShowBBS");
+		app.addServlet("/PostBBS", "PostBBS");
 		try (ServerSocket server = new ServerSocket(8001)) {
 			for (;;) {
 				Socket socket = server.accept();
