@@ -8,8 +8,8 @@ import com.morita.mhcat.servletimpl.*;
 import com.morita.mhcat.util.*;
 
 public class ServerThread implements Runnable {
-    private static final String DOCUMENT_ROOT = "/Library/WebServer/Documents";
-    private static final String ERROR_DOCUMENT = "/Users/moritahokuto/workspace/prog_ex/prog_web_server/src/webserver/error_document";
+    private static final String DOCUMENT_ROOT = MyWebappPath.DOCUMENT_ROOT.getPath();
+    private static final String ERROR_DOCUMENT = MyWebappPath.ERROR_DOCUMENT.getPath();
 	private Socket socket;
 	
 	ServerThread(Socket socket) {
@@ -83,7 +83,7 @@ public class ServerThread implements Runnable {
 			Path pathObj = fs.getPath(DOCUMENT_ROOT + path);
 			Path realPath;
 			try {
-				realPath = pathObj.toRealPath();
+				realPath = pathObj.toRealPath(); // ブラウザから指定されたパスを絶対パスに交換しています。
 			} catch (NoSuchFileException ex) {
 				SendResponse.sendNotFoundResponse(output, ERROR_DOCUMENT);
 				return;

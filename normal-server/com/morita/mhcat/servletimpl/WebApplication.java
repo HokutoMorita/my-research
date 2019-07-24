@@ -4,10 +4,16 @@ import java.net.*;
 import java.nio.file.*;
 import java.util.*;
 
+/**
+ * Webアプリケーションを表現するクラス
+ */
 public class WebApplication {
-    // アプリケーションが置かれているディレクトリを指定
+    /** アプリケーションが置かれているディレクトリを指定 */
     private static String WEBAPPS_DIR = MyWebappPath.MY_WEBAPP_DIR.getPath();
+
+    /** Webアプリケーション名(ディレクトリ名)をキーとして、複数のWebアプリケーションを保持します。 */
     private static Map<String, WebApplication> webAppCollection = new HashMap<String, WebApplication>();
+
     String directory;
     ClassLoader classLoader;
     private Map<String, ServletInfo> servletCollection = new HashMap<String, ServletInfo>();

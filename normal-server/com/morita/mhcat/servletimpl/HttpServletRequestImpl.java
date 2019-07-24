@@ -36,11 +36,21 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 		}
 	}
 	
+	/**
+     * GET/POSTメソッドを識別します。
+     * @return GET or POST
+     */
     @Override
     public String getMethod() {
 		return this.method;
     }
 
+	/**
+     * パラメタ名を引数として私、その値を取得します。
+     *  GETのときはクエリストリングに付けられたGETパラメタを取得します。
+     *  POSTのときはPOSTで送付されたリクエストボディのPOSTパラメタを取得します。
+     * @return パラメタ
+     */
     @Override
     public String getParameter(String name) {
 		String[] values = getParameterValues(name);
@@ -49,7 +59,11 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 		}
 		return values[0];
     }
-    
+	
+	/**
+     * 同名の複数のパラメタがあったとき、それらの値のすべてを配列で取得します。
+     * @return パラメタ配列
+     */
     @Override
     public String[] getParameterValues(String name) {
 		String[] values = this.parameterMap.get(name);
@@ -67,6 +81,9 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 		return decoded;	
     }
 
+	/**
+     * パラメタのエンコーディングを指定します。
+     */
     @Override
     public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
 		if (!Charset.isSupported(env)) {
@@ -74,7 +91,11 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 		}
 		this.characterEncoding = env;
     }
-    
+	
+	/**
+     * クライアントから送られてきたCookieを配列として全件取得します。
+     * @return Cookie配列
+     */
     @Override
     public Cookie[] getCookies() {
 		return this.cookies;

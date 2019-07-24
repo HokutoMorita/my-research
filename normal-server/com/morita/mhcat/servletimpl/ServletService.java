@@ -5,6 +5,10 @@ import com.morita.mhcat.servlet.http.*;
 import com.morita.mhcat.util.*;
 
 public class ServletService {
+
+	/**
+	 * URLClassLoaderクラスを使いサーブレットのクラスをロードして、クラスのnewInstance()メソッドで、サーブレットを生成します。
+	 */
     private static HttpServlet createServlet(ServletInfo info) throws Exception {
 		Class<?> clazz = info.webApp.classLoader.loadClass(info.servletClassName);
 		return (HttpServlet)clazz.newInstance();
@@ -46,7 +50,9 @@ public class ServletService {
 	    			 Map<String, String> requestHeader,
 	    			 InputStream input, OutputStream output)
 		    throws Exception {
+		// 該当のサーブレットの初回の呼び出しで、まだサーブレットのインスタンスが生成されていない場合、
 		if (info.servlet == null) {
+			// クラスファイルを動的にロードし、サーブレットを生成します。
 			info.servlet = createServlet(info);
 		}
 

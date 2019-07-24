@@ -11,7 +11,7 @@ public class SendResponse {
 		Util.writeLine(output, "Server: Henacat/0.3");
 		Util.writeLine(output, "Connection: close");
 		Util.writeLine(output, "Content-type: " + contentType);
-		hg.generate(output);
+		hg.generate(output); // Set-Cookieヘッダを出力します。
 		Util.writeLine(output, "");
     }
 

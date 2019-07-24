@@ -5,6 +5,9 @@ import java.util.*;
 import java.io.*;
 import java.text.*;
 
+/**
+ * Set-Cookieヘッダを生成するクラス
+ */
 class ResponseHeaderGeneratorImpl implements ResponseHeaderGenerator {
 	private ArrayList<Cookie> cookies;
 	
@@ -18,6 +21,9 @@ class ResponseHeaderGeneratorImpl implements ResponseHeaderGenerator {
 		return df.format(cal.getTime()) + " GMT";
     }
 
+	/**
+	 * Set-Cookieヘッダを生成します。
+	 */
     public void generate(OutputStream output) throws IOException {
 		for (Cookie cookie : cookies) {
 			String header;
