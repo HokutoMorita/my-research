@@ -8,7 +8,7 @@ import com.morita.mhcat.servletimpl.*;
 import com.morita.mhcat.util.*;
 
 public class ServerThread implements Runnable {
-    private static final String DOCUMENT_ROOT = MyWebappPath.DOCUMENT_ROOT.getPath();
+    private static final String DOCUMENT_ROOT = MyWebappPath.MY_WEBAPP_DIR.getPath();
     private static final String ERROR_DOCUMENT = MyWebappPath.ERROR_DOCUMENT.getPath();
 	private Socket socket;
 	

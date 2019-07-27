@@ -8,7 +8,8 @@ import com.morita.mhcat.util.*;
 
 public class HttpServletRequestImpl implements HttpServletRequest {
     private String method;
-    private String characterEncoding = "ISO-8859-1";
+	private String characterEncoding = "ISO-8859-1";
+	//private String characterEncoding = "UTF-8";
     private Map<String, String[]> parameterMap;
 	private Cookie[] cookies;
 	/** ƒZƒbƒVƒ‡ƒ“‚ğ•Û‚·‚é */
