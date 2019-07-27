@@ -22,8 +22,7 @@ public class MyURLDecoder {
         return digit;
     }
 
-    public static String decode(String src, String enc)
-      throws UnsupportedEncodingException {
+    public static String decode(String src, String enc) throws UnsupportedEncodingException {
         byte[] srcBytes = src.getBytes("ISO_8859_1");
         // 変換後の方が長くなることはないので、srcBytesの
         // 長さの配列をいったん確保する。
@@ -32,8 +31,7 @@ public class MyURLDecoder {
         int destIdx = 0;
         for (int srcIdx = 0; srcIdx < srcBytes.length; srcIdx++) {
             if (srcBytes[srcIdx] == (byte)'%') {
-                destBytes[destIdx] = (byte)hex2int(srcBytes[srcIdx + 1],
-                                                   srcBytes[srcIdx + 2]);
+                destBytes[destIdx] = (byte)hex2int(srcBytes[srcIdx + 1], srcBytes[srcIdx + 2]);
                 srcIdx += 2;
             } else {
                 destBytes[destIdx] = srcBytes[srcIdx];

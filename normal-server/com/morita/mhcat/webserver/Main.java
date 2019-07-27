@@ -5,13 +5,18 @@ import java.net.*;
 
 public class Main {
     public static void main(String[] argv) throws Exception {
-		WebApplication app = WebApplication.createInstance("sessiontest");
-		app.addServlet("/SessionTest", "SessionTest");
-		app = WebApplication.createInstance("ajaxtest");
-		app.addServlet("/GetAddress", "GetAddress");
+		WebApplication app = WebApplication.createInstance("hello");
+		// WebApplicationにサーブレットを登録している。
+		app.addServlet("/HelloSession", "HelloSession");
+		app.addServlet("/HelloSession2", "HelloSession2");
 		try (ServerSocket server = new ServerSocket(8001)) {
 			for (;;) {
+				// クライアントからの接続の待ち受けを行なっている。
+				// accept()メソッドは、クライアントから接続されるまで返ってきません。
 				Socket socket = server.accept();
+
+				// TCP接続を待ち受け、accept()したら、ServerThreadにそのソケットを渡して、
+				// 別スレッドで起動しています。
 				ServerThread serverThread = new ServerThread(socket);
 				Thread thread = new Thread(serverThread);
 				thread.start();

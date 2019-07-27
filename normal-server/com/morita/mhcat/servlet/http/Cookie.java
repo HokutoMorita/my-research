@@ -1,5 +1,8 @@
 package com.morita.mhcat.servlet.http;
 
+/**
+ * 1‚Â‚ÌCookie‚ð•\Œ»‚·‚éƒNƒ‰ƒX
+ */
 public class Cookie {
     private String name;
     private String value;
