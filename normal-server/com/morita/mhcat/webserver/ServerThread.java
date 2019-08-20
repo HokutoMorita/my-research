@@ -62,6 +62,8 @@ public class ServerThread implements Runnable {
 			}
 			output = new BufferedOutputStream(socket.getOutputStream());
 
+			// サーブレットが登録されているかつURLでサーブレットが保管されているディレクトリが入力されている場合、
+			// サーブレットを呼び出す
 			String appDir = path.substring(1).split("/")[0];
 			WebApplication webApp = WebApplication.searchWebApplication(appDir);
 			if (webApp != null) {
@@ -71,6 +73,8 @@ public class ServerThread implements Runnable {
 					return;
 				}
 			}
+
+			// 以下はサーブレットではなく、ファイルをリクエストしている場合の処理
 			String ext = null;
 			String[] tmp = reqUri.split("\\.");
 			ext = tmp[tmp.length - 1];
