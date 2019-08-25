@@ -79,7 +79,7 @@ public class ServletService {
 		if (resp.status == HttpServletResponse.SC_OK) {
 			ResponseHeaderGenerator hg = new ResponseHeaderGeneratorImpl(resp.cookies);
 			SendResponse.sendOkResponseHeader(output, resp.contentType, hg);
-			resp.printWriter.flush();
+			resp.printWriter.flush(); // ファイルをクローズする前にデータをファイルに書き込みます。
 			byte[] outputBytes = outputBuffer.toByteArray();
 			for (byte b: outputBytes) {
 				output.write((int)b);
