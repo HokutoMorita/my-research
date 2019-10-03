@@ -1,6 +1,7 @@
 package com.morita.mhcat.servletimpl;
 import java.util.*;
 import java.util.concurrent.*;
+import nz.sodium.*;
 
 /**
  * セッションオブジェクトを管理するクラス
@@ -14,7 +15,7 @@ class SessionManager {
     private final int CLEAN_INTERVAL = 60; // seconds
 	private final int SESSION_TIMEOUT = 10; // minutes
 	
-    private Map<String, HttpSessionImpl> sessions = new ConcurrentHashMap<String, HttpSessionImpl>();
+    private Map<String, Cell<HttpSessionImpl>> sessions = new ConcurrentHashMap<String, Cell<HttpSessionImpl>>();
 	private SessionIdGenerator sessionIdGenerator;
 	
 	SessionManager() {
@@ -22,39 +23,50 @@ class SessionManager {
 
 		Runnable cleaner = new Runnable() {
 			public void run() {
-				cleanSessions();
+				for (String id : sessions.keySet()) {
+					cleanSession(id);
+				}
 			}
 		};
 		this.cleanerHandle = scheduler.scheduleWithFixedDelay(cleaner, CLEAN_INTERVAL, CLEAN_INTERVAL, TimeUnit.SECONDS);
 		this.sessionIdGenerator = new SessionIdGenerator();
     }
 
-    synchronized HttpSessionImpl getSession(String id) {
-		HttpSessionImpl ret = sessions.get(id);
-		if (ret != null) {
-			ret.access();
-		}
-		return ret;
+    synchronized Cell<HttpSessionImpl> getSession(String id) {
+		StreamSink<Unit> sAccess = new StreamSink<>();
+		Cell<HttpSessionImpl> cHttpSession = sessions.get(id);
+		Stream<HttpSessionImpl> sHttpSession = sAccess.snapshot(cHttpSession, (u, session) -> session);
+		Listener l = sHttpSession.listen(x -> {
+			x.access();
+		});
+		sAccess.send(Unit.UNIT);
+		l.unlisten();
+		return cHttpSession;
     }
 
-    HttpSessionImpl createSession() {
+    Cell<HttpSessionImpl> createSession() {
 		// セッションIDを生成します。
 		String id = this.sessionIdGenerator.generateSessionId();
-		HttpSessionImpl session = new HttpSessionImpl(id);
-		sessions.put(id, session);
-		return session;
+		HttpSessionImpl httpSessionImpl = new HttpSessionImpl(id);
+		CellSink<HttpSessionImpl> cHttpSessionSink = new CellSink<>(httpSessionImpl);
+		Cell<HttpSessionImpl> cHttpSession = cHttpSessionSink;
+		sessions.put(id, cHttpSession);
+		return cHttpSession;
     }
 
 	/**
 	 * 保持しているセッションオブジェクトをじゅんに確認し、SESSION_TIMEOUTの分数を超えたセッションオブジェクトを削除します。
 	 */
-    private synchronized void cleanSessions() {
-		for (Iterator<String> it = sessions.keySet().iterator(); it.hasNext();) {
-			String id = it.next();
-			HttpSessionImpl session = this.sessions.get(id);
-			if (session.getLastAccessedTime() < (System.currentTimeMillis() - (SESSION_TIMEOUT * 60 * 1000))) {
-				it.remove();
-			}
-		}
+    private synchronized void cleanSession(String id) {
+		StreamSink<Unit> sClean = new StreamSink<>();
+		// filterで何も該当しなかった場合は、ユニットが返ってる可能性あり
+		Stream<HttpSessionImpl> sSession = sClean.snapshot(sessions.get(id), (u, cSession) -> cSession)
+												 .filter(x -> x.getLastAccessedTime() < (System.currentTimeMillis() - (SESSION_TIMEOUT * 60 * 1000)));
+		Listener l = sSession.listen(x -> {
+			System.out.println(id + " is session time out");
+			sessions.remove(id);
+		});
+		sClean.send(Unit.UNIT);
+		l.unlisten();
     }
 }

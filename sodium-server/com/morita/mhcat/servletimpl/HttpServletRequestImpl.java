@@ -3,6 +3,8 @@ import java.util.*;
 import java.io.*;
 import java.nio.charset.*;
 
+import nz.sodium.*;
+
 import com.morita.mhcat.servlet.http.*;
 import com.morita.mhcat.util.*;
 
@@ -13,7 +15,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
     private Map<String, String[]> parameterMap;
 	private Cookie[] cookies;
 	/** セッションを保持する */
-	private HttpSessionImpl session;
+	private Cell<HttpSessionImpl> session;
 	/** セッションIDをCookieに保持するためのresponse */
 	private HttpServletResponseImpl response;
 	/** セッションはWebアプリケーション単位なので、WebApplicationを保持するwebApp */
@@ -121,41 +123,44 @@ public class HttpServletRequestImpl implements HttpServletRequest {
     }
 
     public HttpSession getSession() {
-		return getSession(true);
+		return this.session.sample();
     }
 
     public HttpSession getSession(boolean create) {
-		if (!create) {
+		/**if (!create) {
 			return this.session;
 		}
 		if (this.session == null) {
 			SessionManager manager = this.webApp.getSessionManager();
 			this.session = manager.createSession();
 			addSessionCookie();
-		}
-		return this.session;
+		}*/
+		return this.session.sample();
     }
 
 	/**
 	 * 「JSESSIONID」という名前のCookieからセッションIDを取り出し、SessionManagerからそれに紐づくセッションを取得します。
 	 * @return セッション
 	 */
-    private HttpSessionImpl getSessionInternal() {
+    private Cell<HttpSessionImpl> getSessionInternal() {
+		SessionManager manager = this.webApp.getSessionManager();
 		if (this.cookies == null) {
-			return null;
+			this.session = manager.createSession();
+			addSessionCookie();
 		}
+		
 		Cookie cookie = null;
 		for (Cookie tempCookie : this.cookies) {
 			if (tempCookie.getName().equals(SESSION_COOKIE_ID)) {
 			cookie = tempCookie;
 			}
 		}
-		SessionManager manager = this.webApp.getSessionManager();
-		HttpSessionImpl ret = null;
+		
 		if (cookie != null) {
-			ret = manager.getSession(cookie.getValue());
+			return manager.getSession(cookie.getValue());
+		} else {
+			return manager.createSession();
 		}
-		return ret;
     }
 
 	/**
@@ -164,7 +169,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 	 */
     private void addSessionCookie() {
 		// Cookieオブジェクトを生成し、PathとHttpOnlyを設定してHttpServletResponseに設定します。
-		Cookie cookie = new Cookie(SESSION_COOKIE_ID, this.session.getId());
+		Cookie cookie = new Cookie(SESSION_COOKIE_ID, this.session.sample().getId());
 		cookie.setPath("/" + webApp.directory + "/");
 		cookie.setHttpOnly(true);
 		this.response.addCookie(cookie);
