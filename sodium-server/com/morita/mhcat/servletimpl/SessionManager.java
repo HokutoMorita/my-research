@@ -1,7 +1,8 @@
 package com.morita.mhcat.servletimpl;
 import java.util.*;
 import java.util.concurrent.*;
-import nz.sodium.*;
+
+import com.morita.mhcat.nz.sodium.*;
 
 /**
  * セッションオブジェクトを管理するクラス

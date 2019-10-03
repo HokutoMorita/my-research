@@ -3,7 +3,7 @@ import java.util.*;
 import java.io.*;
 import java.nio.charset.*;
 
-import nz.sodium.*;
+import com.morita.mhcat.nz.sodium.*;
 
 import com.morita.mhcat.servlet.http.*;
 import com.morita.mhcat.util.*;
