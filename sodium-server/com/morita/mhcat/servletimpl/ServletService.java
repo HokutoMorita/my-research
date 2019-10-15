@@ -3,6 +3,7 @@ import java.util.*;
 import java.io.*;
 import com.morita.mhcat.servlet.http.*;
 import com.morita.mhcat.util.*;
+import nz.sodium.*;
 
 public class ServletService {
 

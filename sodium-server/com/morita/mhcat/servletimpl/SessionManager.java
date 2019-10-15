@@ -2,19 +2,23 @@ package com.morita.mhcat.servletimpl;
 import java.util.*;
 import java.util.concurrent.*;
 
-import com.morita.mhcat.nz.sodium.*;
+import nz.sodium.*;
 
 /**
  * セッションオブジェクトを管理するクラス
  */
 class SessionManager {
-	private final ScheduledExecutorService scheduler;
+private final ScheduledExecutorService scheduler;
 	
     @SuppressWarnings("unused")
 	private final ScheduledFuture<?> cleanerHandle;
 	
-    private final int CLEAN_INTERVAL = 60; // seconds
-	private final int SESSION_TIMEOUT = 10; // minutes
+//    private final int CLEAN_INTERVAL = 60; // seconds
+//	private final int SESSION_TIMEOUT = 10; // minutes
+	
+    // セッションタイムアウト確認用
+	private final int CLEAN_INTERVAL = 5; // seconds
+	private final int SESSION_TIMEOUT = 5; // minutes
 	
     private Map<String, Cell<HttpSessionImpl>> sessions = new ConcurrentHashMap<String, Cell<HttpSessionImpl>>();
 	private SessionIdGenerator sessionIdGenerator;
@@ -35,14 +39,25 @@ class SessionManager {
 
     synchronized Cell<HttpSessionImpl> getSession(String id) {
 		StreamSink<Unit> sAccess = new StreamSink<>();
-		Cell<HttpSessionImpl> cHttpSession = sessions.get(id);
-		Stream<HttpSessionImpl> sHttpSession = sAccess.snapshot(cHttpSession, (u, session) -> session);
-		Listener l = sHttpSession.listen(x -> {
-			x.access();
-		});
-		sAccess.send(Unit.UNIT);
-		l.unlisten();
-		return cHttpSession;
+		Cell<HttpSessionImpl> cSession = sessions.get(id);
+		Stream<HttpSessionImpl> sSession = sAccess.snapshot(cSession, (u, session) -> session);
+		if (cSession != null) {
+			Listener l = Transaction.run(() -> {
+				Listener l_ = sSession.listen(x -> {
+					x.access();
+				});
+				sAccess.send(Unit.UNIT);
+				return l_;
+			});
+//			Listener l = sSession.listen(x -> {
+//				x.access();
+//			});
+//			sAccess.send(Unit.UNIT);
+			l.unlisten();
+			return cSession;
+		} else {
+			return createSession();
+		}
     }
 
     Cell<HttpSessionImpl> createSession() {
@@ -62,12 +77,22 @@ class SessionManager {
 		StreamSink<Unit> sClean = new StreamSink<>();
 		// filterで何も該当しなかった場合は、ユニットが返ってる可能性あり
 		Stream<HttpSessionImpl> sSession = sClean.snapshot(sessions.get(id), (u, cSession) -> cSession)
-												 .filter(x -> x.getLastAccessedTime() < (System.currentTimeMillis() - (SESSION_TIMEOUT * 60 * 1000)));
-		Listener l = sSession.listen(x -> {
-			System.out.println(id + " is session time out");
-			sessions.remove(id);
+												 //.filter(x -> x.getLastAccessedTime() < (System.currentTimeMillis() - (SESSION_TIMEOUT * 60 * 1000)));
+												 // セッションタイムアウト確認用
+				                                 .filter(x -> x.getLastAccessedTime() < (System.currentTimeMillis() - (SESSION_TIMEOUT * 1000)));
+		Listener l = Transaction.run(() -> {
+			Listener l_ = sSession.listen(x -> {
+				System.out.println(id + " is session time out");
+				sessions.remove(id);
+			});
+			sClean.send(Unit.UNIT);
+			return l_;
 		});
-		sClean.send(Unit.UNIT);
+//		Listener l = sSession.listen(x -> {
+//			System.out.println(id + " is session time out");
+//			sessions.remove(id);
+//		});
+//		sClean.send(Unit.UNIT);
 		l.unlisten();
     }
 }

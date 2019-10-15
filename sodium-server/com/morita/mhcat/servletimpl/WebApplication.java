@@ -4,6 +4,8 @@ import java.net.*;
 import java.nio.file.*;
 import java.util.*;
 
+import nz.sodium.*;
+
 /**
  * Webアプリケーションを表現するクラス
  */
